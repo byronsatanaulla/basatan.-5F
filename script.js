@@ -1,26 +1,54 @@
-// Definir la topología de red inicial
-let networkTopology = {
-    "router1": ["router2", "router3"],
-    "router2": ["router1", "router3"],
-    "router3": ["router1", "router2"]
-};
+class RouteSimulator {
+    constructor() {
+        this.routes = {}; // Objeto para almacenar las rutas y su estado
+    }
 
-function disconnectLink(routerA, routerB) {
-    // Verificar si los routers están en la topología
-    if (networkTopology[routerA] && networkTopology[routerB]) {
-        // Desconectar el enlace entre routerA y routerB
-        networkTopology[routerA] = networkTopology[routerA].filter(router => router !== routerB);
-        networkTopology[routerB] = networkTopology[routerB].filter(router => router !== routerA);
-        console.log(`Se desconectó el enlace entre ${routerA} y ${routerB}.`);
+    addRoute(routeName) {
+        this.routes[routeName] = true; // true significa que la ruta está activa
+    }
 
-        // Simular la actualización de la topología de red
-        setTimeout(() => {
-            console.log("Actualización de la topología de red:");
-            console.log(networkTopology);
-        }, 3000); // Simula un tiempo de 3 segundos para la detección y actualización
-    } else {
-        console.log("Al menos uno de los routers especificados no existe en la topología de red.");
+    connectRoute(routeName) {
+        if (routeName in this.routes) {
+            this.routes[routeName] = true;
+            document.getElementById('routesStatus').innerHTML = `La ruta ${routeName} ha sido conectada.`;
+        } else {
+            document.getElementById('routesStatus').innerHTML = `La ruta ${routeName} no existe.`;
+        }
+    }
+
+    disconnectRoute(routeName) {
+        if (routeName in this.routes) {
+            this.routes[routeName] = false;
+            document.getElementById('routesStatus').innerHTML = `La ruta ${routeName} ha sido desconectada.`;
+        } else {
+            document.getElementById('routesStatus').innerHTML = `La ruta ${routeName} no existe.`;
+        }
+    }
+
+    showRoutesStatus() {
+        let status = "Estado de las rutas:<br>";
+        for (let route in this.routes) {
+            status += `${route}: ${this.routes[route] ? 'Conectada' : 'Desconectada'}<br>`;
+        }
+        document.getElementById('routesStatus').innerHTML = status;
     }
 }
 
-disconnectLink("router1", "router2");
+const simulator = new RouteSimulator();
+simulator.addRoute("Route1");
+simulator.addRoute("Route2");
+simulator.addRoute("Route3");
+
+function connectRoute() {
+    const routeName = prompt("Ingrese el nombre de la ruta a conectar:");
+    simulator.connectRoute(routeName);
+}
+
+function disconnectRoute() {
+    const routeName = prompt("Ingrese el nombre de la ruta a desconectar:");
+    simulator.disconnectRoute(routeName);
+}
+
+function showRoutesStatus() {
+    simulator.showRoutesStatus();
+}
